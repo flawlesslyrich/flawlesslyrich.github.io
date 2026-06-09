@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>⚔️ Shadowhold Dungeon Crawler</title>
+    <style>
+        /* purely presentational – no interactive elements, respects restriction "no DOM manipulation" */
+        body {
+            background: #0a0f1e;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 1rem;
+        }
+        .info-panel {
+            background: #1e1a2fcc;
+            backdrop-filter: blur(4px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            max-width: 700px;
+            border: 1px solid #a67c52;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            color: #f3e9c0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin: 0 0 0.5rem 0;
+            letter-spacing: 2px;
+            color: #e6c8a0;
+            text-shadow: 0 2px 5px #2a1e12;
+        }
+        .desc {
+            text-align: center;
+            border-top: 1px dashed #b87c4f;
+            border-bottom: 1px dashed #b87c4f;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            background: #00000055;
+            border-radius: 12px;
+        }
+        .feature-list {
+            font-size: 0.8rem;
+            margin-top: 1rem;
+            padding-left: 1.2rem;
+        }
+        hr {
+            border-color: #a5663a;
+        }
+        footer {
+            font-size: 0.7rem;
+            text-align: center;
+            margin-top: 1rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+<div class="info-panel">
+    <h1>🗡️ SHADOWHOLD: DEPTHS 🛡️</h1>
+    <div class="desc">
+        A text-based dungeon crawler where you explore cursed ruins, battle foul creatures, and grow stronger.
+        <br>▶ Use the console-like menu to survive the depths. Every choice matters.
+    </div>
+    <hr>
+    <div class="feature-list">
+        <strong>⚙️ GAME FEATURES</strong><br>
+        • 🧭 Explore – random enemy encounters & loot<br>
+        • 📊 View Stats – health, attack, level, gold, XP<br>
+        • 🎒 Inventory – manage potions, consumables<br>
+        • 🍖 Rest – recover HP (costs gold)<br>
+        • 💀 Permadeath warning – defeat resets your progress!<br>
+        <em>🔁 Menu driven with full validation & game loop</em>
+    </div>
+    <footer>⚔️ prompt() • alert() • confirm() only | Modular JS (ES6 modules)</footer>
+</div>
+
+<script type="module">
+    // ----------------------------------------------
+    // MAIN ENTRY MODULE: game.js orchestrates the menu loop
+    // All modules imported demonstrate import/export + closures
+    // ----------------------------------------------
+    import player from './player.js';
+    import { getRandomEnemy } from './enemies.js';
+    import { startCombat } from './combat.js';
+
+    // ----------------------------------------------
+    // Helper: safe integer input from prompt (validation)
+    // ----------------------------------------------
+    function getMenuChoice(min, max, cancelDefault = null) {
+        let input;
+        while (true) {
+            input = prompt(
+                "⚔️  SHADOWHOLD - MAIN MENU  ⚔️\n" +
+                "─────────────────────────────\n" +
+                "1️⃣  🧭 Explore the Dungeon\n" +
+                "2️⃣  📊 View Character Stats\n" +
+                "3️⃣  🎒 View Inventory\n" +
+                "4️⃣  🍖 Rest at Campfire\n" +
+                "5️⃣  🚪 Exit Game\n" +
+                "─────────────────────────────\n" +
+                "Choose an option (1-5):"
+            );
+            if (input === null) return 5;   // treat cancel as exit
+            const choice = Number(input);
+            if (!isNaN(choice) && Number.isInteger(choice) && choice >= min && choice <= max) {
+                return choice;
+            }
+            alert(`❌ Invalid choice! Please enter a number between ${min} and ${max}.`);
+        }
+    }
+
+    // ----------------------------------------------
+    // Reset the game world (full player reboot)
+    // Show closure in action: player.reset() rebuilds internal state
+    // ----------------------------------------------
+    function resetGameWorld() {
+        player.reset();           // reset all stats & inventory to fresh start
+        alert("💀 YOU HAVE PERISHED IN THE DARKNESS...\n✨ Your soul returns to the entrance, weakened but alive. ✨");
+        alert("🏥 Your wounds are mended by mysterious forces. Stats have been restored to base values.");
+    }
+
+    // ----------------------------------------------
+    // VIEW STATS: demonstrates closure getters & data types
+    // ----------------------------------------------
+    function viewStats() {
+        const stats = player.getStats();
+        alert(
+            `📜  CHARACTER STATUS  📜\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `❤️  Health     : ${stats.health} / ${stats.maxHealth}\n` +
+            `⚔️  Attack     : ${stats.attack}\n` +
+            `⭐  Level      : ${stats.level}\n` +
+            `💰  Gold       : 🪙 ${stats.gold}\n` +
+            `✨  Experience : ${stats.xp} / ${stats.xpToNext}\n` +
+            `━━━━━━━━━━━━━━━━━━━━━━\n` +
+            `“Courage is not the absence of fear.”`
+        );
+    }
+
+    // ----------------------------------------------
+    // VIEW INVENTORY: demonstrates array iteration (forEach) and array methods
+    // uses getInventory() from player module (closure)
+    // ----------------------------------------------
+    function viewInventory() {
+        const inventory = player.getInventory();   // returns array copy
+        if (!inventory || inventory.length === 0) {
+            alert("🎒 Your backpack is EMPTY. Find loot by exploring or slaying enemies!");
+            return;
+        }
+        let itemList = "🎒  INVENTORY  🎒\n━━━━━━━━━━━━━━━━━━\n";
+        // forEach iteration (requirement: iterating over arrays)
+        inventory.forEach((item, index) => {
+            itemList += `${index + 1}. ${item}\n`;
+        });
+        itemList += `━━━━━━━━━━━━━━━━━━\nTotal: ${inventory.length} item(s)`;
+        alert(itemList);
+    }
+
+    // ----------------------------------------------
+    // REST MECHANICS: spend gold, recover health, with validation
+    // demonstrates function expressions & arrow helper
+    // ----------------------------------------------
+    const randomRange = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+    function restAction() {
+        const REST_COST = 6;
+        const currentGold = player.getGold();
+        if (currentGold < REST_COST) {
+            alert(`🍖 Not enough gold! Rest costs ${REST_COST} gold. You have ${currentGold} gold. Defeat enemies to earn more.`);
+            return false;
+        }
+        const currentHp = player.getHealth();
+        const maxHp = player.getMaxHealth();
+        if (currentHp >= maxHp) {
+            alert("🍖 You are already at full health! No need to rest.");
+            return false;
+        }
+        const confirmed = confirm(`🔥 Rest at campfire? (Cost: ${REST_COST} gold)\nRecover ${randomRange(8, 18)}-${randomRange(12, 22)} HP. Continue?`);
+        if (!confirmed) return false;
+        
+        // spend gold using player method (array/methods not directly here but closure)
+        if (!player.spendGold(REST_COST)) {
+            alert("Something went wrong. Cannot rest.");
+            return false;
+        }
+        const healAmount = randomRange(10, 22);
+        const newHp = player.heal(healAmount);
+        alert(`🍖 You rest by the smoldering embers. Restored ${healAmount} HP.\n❤️ Health now: ${newHp} / ${player.getMaxHealth()}. Gold left: ${player.getGold()}`);
+        return true;
+    }
+
+    // ----------------------------------------------
+    // EXPLORE: encounters, combat, loot, XP - core loop with closures & array methods
+    // ----------------------------------------------
+    async function exploreAction() {  // synchronous, no async needed but classic flow
+        alert("🧭 You venture deeper into the shadowy corridors... Torch flickering...");
+        // filter enemies based on player level (use array .filter + random)
+        const playerLevel = player.getLevel();
+        const enemy = getRandomEnemy(playerLevel);
+        if (!enemy) {
+            alert("The dungeon is strangely quiet... no foe appears. You move forward.");
+            return;
+        }
+        
+        alert(`⚔️  A wild ${enemy.name} appears! ⚔️\n❤️ ${enemy.name} HP: ${enemy.health} | ⚔️ Attack: ${enemy.attack}\n“${enemy.battleCry || "Prepare to die!"}”`);
+        
+        // COMBAT RESOLUTION (import from combat module)
+        const combatResult = startCombat(player, enemy);
+        
+        // combatResult = "win" , "flee" , "defeat"
+        if (combatResult === "defeat") {
+            // player died in combat => full game reset
+            resetGameWorld();
+            return;
+        }
+        else if (combatResult === "flee") {
+            alert("💨 You fled back to the previous chamber, heart racing. No rewards gained.");
+            return;
+        }
+        else if (combatResult === "win") {
+            // VICTORY! grant gold, XP, random potion drop (array push demonstration)
+            const goldReward = enemy.gold;
+            const xpReward = enemy.xp;
+            player.addGold(goldReward);
+            player.addXP(xpReward);
+            
+            let rewardMsg = `🏆 VICTORY! You defeated ${enemy.name}!\n💰 +${goldReward} gold | ✨ +${xpReward} XP`;
+            
+            // random loot: 40% chance to drop a health potion (push method on inventory)
+            const dropChance = Math.random();
+            if (dropChance < 0.4) {
+                player.addItem("❤️ Health Potion");
+                rewardMsg += "\n🍾 You looted a Health Potion! (added to inventory)";
+            } else if (dropChance < 0.55) {
+                // small bonus: sometimes find a minor treasure (extra gold)
+                const extraGold = Math.floor(Math.random() * 10) + 5;
+                player.addGold(extraGold);
+                rewardMsg += `\n✨ Glimmering coins: +${extraGold} extra gold!`;
+            }
+            alert(rewardMsg);
+            
+            // check level up after XP addition (inside addXP we call tryLevelUp)
+            const newLevel = player.getLevel();
+            const newStats = player.getStats();
+            if (newStats.level > playerLevel) {
+                alert(`🌟 LEVEL UP! You are now level ${newStats.level}! 🌟\n❤️ Max HP increased to ${newStats.maxHealth}\n⚔️ Attack increased to ${newStats.attack}\n💚 HP fully restored.`);
+            }
+            // extra: after combat, maybe show updated stats
+        } else {
+            alert("The shadows twist ... something unexpected happened.");
+        }
+    }
+
+    // ----------------------------------------------
+    // MAIN GAME LOOP (while + switch, menu-driven)
+    // ----------------------------------------------
+    function runGame() {
+        let running = true;
+        while (running) {
+            const choice = getMenuChoice(1, 5);
+            switch (choice) {
+                case 1: // Explore
+                    exploreAction();
+                    break;
+                case 2: // View stats
+                    viewStats();
+                    break;
+                case 3: // Inventory
+                    viewInventory();
+                    break;
+                case 4: // Rest
+                    restAction();
+                    break;
+                case 5: // Exit
+                    const exitConfirm = confirm("❓ Do you really want to abandon the dungeon depths? Your progress will be lost.");
+                    if (exitConfirm) {
+                        alert("🏁 Farewell, adventurer. The darkness will remember your steps...");
+                        running = false;
+                    }
+                    break;
+                default:
+                    alert("Invalid state.");
+            }
+        }
+    }
+    
+    // Start the game (initial message)
+    alert("🗡️  WELCOME TO SHADOWHOLD: DEPTHS  🗡️\n\nA dungeon crawler where your choices define fate.\nUse the menu to explore, fight, rest, and survive.\n⚠️ Death resets your progress — be prepared!");
+    runGame();
+</script>
+
+<!-- Module files are defined separately (player.js, enemies.js, combat.js) for modularity -->
+<!-- Each module uses export/import, closure, arrow functions, array methods, loops -->
+</body>
+</html>
