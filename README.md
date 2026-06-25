@@ -1,4 +1,5 @@
 # Project Title
+Text File Search Tool
 
 A short descriptions of what this projetc does and who it's for.
 
@@ -8,8 +9,14 @@ Steps to install and run the project.
 
 ## Usage
 
-Examples of how to use the project
+Download the file and run 
+=======================
+chmod +x txtsearch.sh
+./txtsearch.sh
+=======================
+in powershell
 
 ### Authors
 
-- Your Names
+- Kingsley Scott
+- Mohammadali Ahangari
