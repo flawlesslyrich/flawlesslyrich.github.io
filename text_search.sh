@@ -11,15 +11,19 @@ main() {
 
     while true 
     do 
-        echo "========== Text File Search Tool ==========" 
-        echo "1. Search Text"
-        echo "2. Set Search Directory/File"
-        echo "3. Filter by File Type"
-        echo "4. Toggle Case Sensitivity"
-        echo "5. Save Results to File"
-        echo "6. Help"
-        echo "7. Exit"
-        echo "==========================================="
+	terminal_cols=$(tput cols) 
+	indent_amount=$(((terminal_cols - 43) / 2)) # calculates the indentation needed to horizontally center the menu
+	terminal_center=$(tput cuf $indent_amount)
+
+        echo "$terminal_center ========== Text File Search Tool ==========" 
+        echo "$terminal_center   1. Search Text"
+        echo "$terminal_center   2. Set Search Directory/File"
+        echo "$terminal_center   3. Filter by File Type"
+        echo "$terminal_center   4. Toggle Case Sensitivity"
+        echo "$terminal_center   5. Save Results to File"
+        echo "$terminal_center   6. Help"
+        echo "$terminal_center   7. Exit"
+        echo "$terminal_center ==========================================="
 
         read -p "Enter your choice: " choice
 
