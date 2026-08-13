@@ -18,25 +18,21 @@ last_results="search_results.txt"
 display_menu()
 {
     clear
+    
+    terminal_cols=$(tput cols) 
+    indent_amount=$(((terminal_cols - 43) / 2)) # calculates the indentation needed to horizontally center the menu 
+    terminal_center=$(tput cuf $indent_amount)
 
-    terminal_cols=$(tput cols)
-    indent_amount=$(( (terminal_cols - 43) / 2 ))
-
-    # Prevent negative indentation on small terminals
-    if [ "$indent_amount" -lt 0 ]; then
-        indent_amount=0
-    fi
-
-    printf "%${indent_amount}s========== Text File Search Tool ==========\n" ""
-    printf "%${indent_amount}s1. Search Text\n" ""
-    printf "%${indent_amount}s2. Set Search Directory/File\n" ""
-    printf "%${indent_amount}s3. Filter by File Type\n" ""
-    printf "%${indent_amount}s4. Toggle Case Sensitivity\n" ""
-    printf "%${indent_amount}s5. Save Results to File\n" ""
-    printf "%${indent_amount}s6. View Previous Search Results\n" ""
-    printf "%${indent_amount}s7. Help\n" ""
-    printf "%${indent_amount}s8. Exit\n" ""
-    printf "%${indent_amount}s===========================================\n" ""
+    echo "$terminal_center ========== Text File Search Tool =========="
+    echo "$terminal_center 1. Search Text"
+    echo "$terminal_center 2. Set Search Directory/File"
+    echo "$terminal_center 3. Filter by File Type"
+    echo "$terminal_center 4. Toggle Case Sensitivity"
+    echo "$terminal_center 5. Save Results to File"
+    echo "$terminal_center 6. View Previous Search Results"
+    echo "$terminal_center 7. Help"
+    echo "$terminal_center 8. Exit"
+    echo "$terminal_center ==========================================="
 }
 
 
@@ -74,11 +70,11 @@ search_text()
     if [ "$case_sensitive" = true ]; then
 
         if [ "$file_filter" = "*" ]; then
-            grep -rn -- "$search_term" "$search_path" 2>/dev/null \
+            grep -rn --color=always -- "$search_term" "$search_path" 2>/dev/null \
                 | tee "$last_results"
         else
             find "$search_path" -type f -name "$file_filter" -exec \
-                grep -nH -- "$search_term" {} + 2>/dev/null \
+                grep -nH --color=always -- "$search_term" {} + 2>/dev/null \
                 | tee "$last_results"
         fi
 
@@ -86,11 +82,11 @@ search_text()
     else
 
         if [ "$file_filter" = "*" ]; then
-            grep -rni -- "$search_term" "$search_path" 2>/dev/null \
+            grep -rni --color=always -- "$search_term" "$search_path" 2>/dev/null \
                 | tee "$last_results"
         else
             find "$search_path" -type f -name "$file_filter" -exec \
-                grep -niH -- "$search_term" {} + 2>/dev/null \
+                grep -niH --color=always -- "$search_term" {} + 2>/dev/null \
                 | tee "$last_results"
         fi
     fi
