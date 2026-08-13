@@ -1,1 +1,69 @@
 this is a test file for class work
+Description
+In this week we will elaborate on the uses of simple selection and multiple selection.
+We will learn how to develop algorithms using variations of the selection control
+structure.
+Introduction
+An important computer operation available to the programmer is the ability to compare
+two variables and then, as a result of the comparison, select one of two alternative
+actions. To represent this operation, special keywords are used: if and else. The
+comparison of data is established in the if clause/statement, and the choice of
+alternatives is determined by the if else or else options. Only one of these alternatives
+will be performed.
+Until now, we have been following sequential logic flow in problem domains i.e. we
+start at the beginning of a method, and execute the first statement, then the second,
+then the third, etc. Each statement gets executed, and each is executed once only.
+This is not very flexible.
+Sequential logic flow represents one of the three control structures used in the
+structured design and structured programming process. The other two structures are
+iteration and selection.
+Lets’ look at the selection structure which is used in problem solving when there is a
+decision to be made. Remember, in the problem where we calculate traffic fines for
+violating speed limit, we need to look for different scenarios as fines vary based on
+over speed limits. A person driving at 20 km/hr overspeed is fined lesser than a
+person going at 50 km/hr overlimit.
+The process of selection allows for options. A program can take two different paths
+depending on the results of a decision. In Java programming language, the selection
+statement is called an if statement. Most PLs use the word ‘if’ to begin the coding for
+the selection process. Hierarchy charts are not a good tool to use as they do not
+depict selection process, we can use flowcharts.
+Boolean Expressions and Relational Operators
+All programming languages allow you to create expressions that can be evaluated as
+either true or false. These are called Boolean expressions, named in honour of the
+English mathematician George Boole. The condition that is tested by an if statement
+must be a Boolean expression.
+The Boolean expression is formed with a relational operator. A relational operator
+determines whether a specific relationship exists between two values. For example,
+the greater than operator (>) determines whether one value is greater than another.
+The equal to operator (==) determines whether two values are equal. Here is the list
+of relational operators that are commonly available in most programming languages
+
+eturn type
+The next keyword is “double”. This is called the return type of the method. All
+methods must have a return type in the header line of their definition, which can
+be void or non-void. Note that this is why constructors are special types of methods -
+they don't have a return type at all, not even void!
+After a method has finished doing its work, it can send a value (a number, a string,
+etc.) back to the program that called it. This is called the return value. Some
+methods do not return a value. In this case, their return type is void. If the method
+does return a value, then the data type of the return value must be indicated in the
+header of the method definition. In the method above, the keyword “double” is there
+instead of "void" before “calculateCost”, it indicates that this method always returns a
+decimal value.
+A method returns either one value (if it is not void) or no value at all (if it is void). It
+cannot return more than one value. (We’ll see later that there are ways of putting
+more than one piece of data into a single return value.)
+Parameter list
+The method name is always followed by parentheses (round brackets). Inside these
+parentheses, we declare variables. The variables declared in a method header are
+called parameters.
+A parameter declaration is very similar to the declaration of a variable located
+inside the body of a method/module (called a local variable). We have already seen
+local variables declared in the modules in Week 5. In the same way as a local
+variable, a parameter declaration is made up of a data type and a variable name. The
+rules for naming parameters are the same as for local variables: always start with a
+lower - case letter.
+A method can have zero, one, or several parameters. Even if it has no parameters,
+the parentheses following the method name are still required.
+The following methods are defined in CarRental class. The calculateCost() method
+calculates the charges and applyTax() returns the rental quote which includes taxes.
